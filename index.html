@@ -1,31 +1,921 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Bookshop | Home</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookshop</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .book-card { transition: transform 0.2s, box-shadow 0.2s; }
+    .book-card:hover { transform: scale(1.05); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    .hidden { display: none; }
+    .section-header { background: linear-gradient(to right, #3b82f6, #1d4ed8); color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; }
+    .cart-item { border-bottom: 1px solid #e5e7eb; padding: 0.5rem 0; }
+    .search-bar { transition: all 0.3s ease; }
+    .search-bar:focus { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); }
+    .qr-code-img { border: 2px solid #e5e7eb; border-radius: 8px; padding: 4px; background: white; }
+    .qr-code-error { color: #ef4444; font-size: 0.875rem; text-align: center; }
+    .qr-code-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      max-width: 300px;
+      width: 100%;
+      transition: transform 0.3s;
+    }
+
+    .qr-code-container:hover {
+      transform: translateY(-5px);
+    }
+
+    .qr-code-container img {
+      width: 150px;
+      height: 150px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 5px;
+      background-color: #f9f9f9;
+    }
+
+    .qr-code-container h4 {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 5px;
+      text-align: center;
+    }
+
+    @media (max-width: 640px) {
+      .qr-code-container {
+        padding: 10px;
+        max-width: 250px;
+      }
+      .qr-code-container img {
+        width: 120px;
+        height: 120px;
+      }
+      .qr-code-container h4 {
+        font-size: 16px;
+      }
+    }
+  </style>
 </head>
-<body>
-  <header>
-    <h1>📚 Online Bookshop</h1>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="books.html">Books</a>
-      <a href="cart.html">Cart</a>
-      <a href="login.html">Login</a>
-    </nav>
-  </header>
+<body class="bg-gray-100">
+  <!-- Navigation Bar -->
+  <nav class="bg-blue-600 p-4 text-white flex justify-between items-center shadow-lg">
+    <h1 class="text-2xl font-bold">Bookshop</h1>
+    <div class="flex items-center space-x-2">
+      <button id="cartBtn" class="bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded transition duration-200">Cart(<span id="cartCount">0</span>)</button>
+      <button id="showLoginBtn" class="bg-gray-500 hover:bg-gray-600 px-4 py-2 rounded transition duration-200">Login</button>
+      <button id="showRegisterBtn" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded transition duration-200">Sign Up</button>
+      <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded hidden transition duration-200">Logout</button>
+      <span id="userGreeting" class="hidden ml-2"></span>
+    </div>
+  </nav>
 
-  <main>
-    <section class="hero">
-      <h2>Welcome to Your Favorite Bookstore</h2>
-      <p>Explore thousands of titles and genres</p>
-      <a href="books.html" class="btn">Browse Books</a>
-    </section>
-  </main>
+  <!-- Login Page -->
+  <div id="loginPage" class="container mx-auto p-6 hidden">
+    <h2 class="text-2xl font-bold mb-4 text-center">Login</h2>
+    <div class="bg-white p-6 rounded-lg shadow-md max-w-md mx-auto">
+      <div class="mb-4">
+        <label class="block text-gray-700 font-medium">Email</label>
+        <input id="loginEmail" type="email" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your email">
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 font-medium">Password</label>
+        <input id="loginPassword" type="password" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your password">
+      </div>
+      <button id="loginBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full transition duration-200">Login</button>
+      <p id="loginError" class="text-red-500 mt-2 hidden text-center"></p>
+    </div>
+  </div>
 
-  <footer>
-    <p>&copy; 2025 Bookshop Automation</p>
-  </footer>
+  <!-- Registration Page -->
+  <div id="registerPage" class="container mx-auto p-6 hidden">
+    <h2 class="text-2xl font-bold mb-4 text-center">Register</h2>
+    <div class="bg-white p-6 rounded-lg shadow-md max-w-md mx-auto">
+      <div class="mb-4">
+        <label class="block text-gray-700 font-medium">First Name <span class="text-red-500">*</span></label>
+        <input id="firstName" type="text" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your first name">
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 font-medium">Last Name <span class="text-red-500">*</span></label>
+        <input id="lastName" type="text" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your last name">
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 font-medium">Email <span class="text-red-500">*</span></label>
+        <input id="registerEmail" type="email" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your email">
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 font-medium">Password <span class="text-red-500">*</span></label>
+        <input id="registerPassword" type="password" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your password">
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 font-medium">Address <span class="text-red-500">*</span></label>
+        <input id="address" type="text" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your address">
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 font-medium">State <span class="text-red-500">*</span></label>
+        <input id="state" type="text" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your state">
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 font-medium">Country <span class="text-red-500">*</span></label>
+        <select id="country" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="IN">India (INR)</option>
+          <option value="US">United States (USD)</option>
+          <option value="GB">United Kingdom (GBP)</option>
+          <option value="AU">Australia (AUD)</option>
+          <option value="CA">Canada (CAD)</option>
+          <option value="JP">Japan (JPY)</option>
+          <option value="DE">Germany (EUR)</option>
+          <option value="FR">France (EUR)</option>
+          <option value="CN">China (CNY)</option>
+          <option value="BR">Brazil (BRL)</option>
+        </select>
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 font-medium">Phone <span class="text-red-500">*</span></label>
+        <input id="phone" type="text" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your phone number">
+      </div>
+      <button id="registerBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full transition duration-200">Register</button>
+      <p id="registerError" class="text-red-500 mt-2 hidden text-center"></p>
+    </div>
+  </div>
+
+  <!-- Books Page -->
+  <div id="booksPage" class="container mx-auto p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold">Browse Books</h2>
+      <div class="flex items-center space-x-4">
+        <input id="searchBar" type="text" class="search-bar p-2 border rounded w-64 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Search by name, author, or genre...">
+        <label class="text-gray-700 font-medium">Currency:</label>
+        <select id="currencySelect" class="p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="IN">India (INR)</option>
+          <option value="US">United States (USD)</option>
+          <option value="GB">United Kingdom (GBP)</option>
+          <option value="AU">Australia (AUD)</option>
+          <option value="CA">Canada (CAD)</option>
+          <option value="JP">Japan (JPY)</option>
+          <option value="DE">Germany (EUR)</option>
+          <option value="FR">France (EUR)</option>
+          <option value="CN">China (CNY)</option>
+          <option value="BR">Brazil (BRL)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Fiction Section -->
+    <div class="mb-8">
+      <h3 class="section-header text-xl font-semibold mb-4">Fiction</h3>
+      <div id="fictionSection" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+    </div>
+
+    <!-- Non-Fiction Section -->
+    <div class="mb-8">
+      <h3 class="section-header text-xl font-semibold mb-4">Non-Fiction</h3>
+      <div id="nonFictionSection" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+    </div>
+
+    <!-- Comedy Section -->
+    <div class="mb-8">
+      <h3 class="section-header text-xl font-semibold mb-4">Comedy</h3>
+      <div id="comedySection" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+    </div>
+
+    <!-- Young Adult Section -->
+    <div class="mb-8">
+      <h3 class="section-header text-xl font-semibold mb-4">Young Adult</h3>
+      <div id="youngAdultSection" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+    </div>
+
+    <!-- Romance Section -->
+    <div class="mb-8">
+      <h3 class="section-header text-xl font-semibold mb-4">Romance</h3>
+      <div id="romanceSection" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+    </div>
+
+    <!-- Famous Books Section -->
+    <div class="mb-8">
+      <h3 class="section-header text-xl font-semibold mb-4">Famous Books</h3>
+      <div id="famousBooksSection" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+    </div>
+
+    <!-- Cart Section -->
+    <div class="mt-8">
+      <h3 class="section-header text-xl font-semibold mb-4">Cart</h3>
+      <div id="cartSection" class="bg-white p-4 rounded-lg shadow-md">
+        <p id="cartEmpty" class="text-gray-500 text-center">Your cart is empty.</p>
+        <div id="cartItems" class="hidden"></div>
+        <p id="cartTotal" class="text-lg font-bold mt-4 text-right hidden">Total: <span id="totalAmount"></span></p>
+        
+        <!-- Payment Options -->
+        <div id="paymentOptions" class="mt-4 hidden">
+          <h3 class="text-lg font-semibold mb-2">Select Payment Method</h3>
+          <select id="paymentMethod" class="border p-2 rounded w-full mb-4">
+            <option value="googlepay">Google Pay</option>
+            <option value="creditcard">Credit Card</option>
+            <option value="debitcard">Debit Card</option>
+          </select>
+
+          <!-- Payment Details -->
+          <div id="googlepayDetails" class="payment-details hidden">
+            <div class="qr-code-container">
+              <h4>Scan to Pay with Google Pay</h4>
+              <img src="images/google-pay-qr-code.png" alt="Payment QR Code" class="qr-code-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <p class="qr-code-error hidden">Failed to load QR code. Please ensure the image is available at the specified path.</p>
+              <p class="text-gray-600 text-center">Open Google Pay, scan the QR code, and complete the payment.</p>
+            </div>
+          </div>
+          <div id="creditcardDetails" class="payment-details hidden">
+            <label for="creditCardNumber" class="block mb-2">Card Number</label>
+            <input type="text" id="creditCardNumber" class="border p-2 rounded w-full mb-2" placeholder="1234 5678 9012 3456">
+            <label for="creditCardExpiry" class="block mb-2">Expiry Date</label>
+            <input type="text" id="creditCardExpiry" class="border p-2 rounded w-full mb-2" placeholder="MM/YY">
+            <label for="creditCardCvv" class="block mb-2">CVV</label>
+            <input type="text" id="creditCardCvv" class="border p-2 rounded w-full" placeholder="123">
+          </div>
+          <div id="debitcardDetails" class="payment-details hidden">
+            <label for="debitCardNumber" class="block mb-2">Card Number</label>
+            <input type="text" id="debitCardNumber" class="border p-2 rounded w-full mb-2" placeholder="1234 5678 9012 3456">
+            <label for="debitCardExpiry" class="block mb-2">Expiry Date</label>
+            <input type="text" id="debitCardExpiry" class="border p-2 rounded w-full mb-2" placeholder="MM/YY">
+            <label for="debitCardCvv" class="block mb-2">CVV</label>
+            <input type="text" id="debitCardCvv" class="border p-2 rounded w-full" placeholder="123">
+          </div>
+        </div>
+        <button id="placeOrderBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mt-4 w-full transition duration-200 hidden">Place Order</button>
+        
+        <!-- Payment Result Section -->
+        <div id="paymentResult" class="mt-4 hidden">
+          <h3 class="text-lg font-semibold mb-2">Payment Status</h3>
+          <div class="flex items-center space-x-2">
+            <p id="paymentStatus" class="mb-2"></p>
+            <div id="statusBadge" class="inline-block px-3 py-1 rounded-full text-sm font-semibold"></div>
+          </div>
+          <div id="confirmPaymentSection" class="hidden mb-2">
+            <p class="text-gray-600">Please confirm payment within <span id="timer">30</span> seconds.</p>
+            <button id="confirmPaymentBtn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mt-2 transition duration-200">Confirm Payment</button>
+          </div>
+          <button id="generateReceiptBtn" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 mt-2 transition duration-200 hidden">Generate Receipt</button>
+          <div id="receiptDetails" class="mt-4 hidden p-4 bg-gray-50 rounded-lg"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const loginPage = document.getElementById('loginPage');
+    const registerPage = document.getElementById('registerPage');
+    const booksPage = document.getElementById('booksPage');
+    const showLoginBtn = document.getElementById('showLoginBtn');
+    const showRegisterBtn = document.getElementById('showRegisterBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userGreeting = document.getElementById('userGreeting');
+    const searchBar = document.getElementById('searchBar');
+    const cartBtn = document.getElementById('cartBtn');
+
+    let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let books = [];
+    let filteredBooks = [];
+    let exchangeRates = {
+      'IN': { currency: 'INR', rate: 1 },
+      'US': { currency: 'USD', rate: 0.012 },
+      'GB': { currency: 'GBP', rate: 0.0095 },
+      'AU': { currency: 'AUD', rate: 0.018 },
+      'CA': { currency: 'CAD', rate: 0.016 },
+      'JP': { currency: 'JPY', rate: 1.8 },
+      'DE': { currency: 'EUR', rate: 0.011 },
+      'FR': { currency: 'EUR', rate: 0.011 },
+      'CN': { currency: 'CNY', rate: 0.085 },
+      'BR': { currency: 'BRL', rate: 0.068 }
+    };
+    let selectedCountry = 'IN';
+
+    // Page Navigation
+    function showPage(page) {
+      loginPage.classList.add('hidden');
+      registerPage.classList.add('hidden');
+      booksPage.classList.add('hidden');
+      page.classList.remove('hidden');
+    }
+
+    showLoginBtn.addEventListener('click', () => showPage(loginPage));
+    showRegisterBtn.addEventListener('click', () => showPage(registerPage));
+    logoutBtn.addEventListener('click', () => {
+      currentUser = null;
+      cart = [];
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('cart');
+      showLoginBtn.classList.remove('hidden');
+      showRegisterBtn.classList.remove('hidden');
+      logoutBtn.classList.add('hidden');
+      userGreeting.classList.add('hidden');
+      showPage(loginPage);
+      updateCart();
+    });
+
+    cartBtn.addEventListener('click', () => {
+      const cartSection = document.getElementById('cartSection');
+      cartSection.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // Registration
+    document.getElementById('registerBtn').addEventListener('click', async () => {
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const email = document.getElementById('registerEmail').value;
+      const password = document.getElementById('registerPassword').value;
+      const address = document.getElementById('address').value;
+      const state = document.getElementById('state').value;
+      const country = document.getElementById('country').value;
+      const phone = document.getElementById('phone').value;
+      const error = document.getElementById('registerError');
+
+      if (!firstName || !lastName || !email || !password || !address || !state || !country || !phone) {
+        error.textContent = 'Please fill in all required fields.';
+        error.classList.remove('hidden');
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:5000/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email_id: email, password, first_name: firstName, last_name: lastName, address, state, country, phone })
+        });
+        const data = await response.json();
+        if (response.ok) {
+          alert('Registration successful! Please login.');
+          showPage(loginPage);
+        } else {
+          error.textContent = data.message || 'User already registered.';
+          error.classList.remove('hidden');
+        }
+      } catch (err) {
+        error.textContent = 'Error registering user.';
+        error.classList.remove('hidden');
+      }
+    });
+
+    // Login
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const error = document.getElementById('loginError');
+
+      try {
+        const response = await fetch('http://localhost:5000/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email_id: email, password })
+        });
+        const data = await response.json();
+        if (response.ok) {
+          currentUser = data.user;
+          localStorage.setItem('currentUser', JSON.stringify(currentUser));
+          showLoginBtn.classList.add('hidden');
+          showRegisterBtn.classList.add('hidden');
+          logoutBtn.classList.remove('hidden');
+          userGreeting.textContent = `Welcome, ${currentUser.first_name}!`;
+          userGreeting.classList.remove('hidden');
+          showPage(booksPage);
+          loadCart();
+        } else {
+          error.textContent = data.message;
+          error.classList.remove('hidden');
+        }
+      } catch (err) {
+        error.textContent = 'Error during login.';
+        error.classList.remove('hidden');
+      }
+    });
+
+    // Load Books
+    async function loadBooks() {
+      try {
+        const response = await fetch('http://localhost:5000/api/books');
+        books = await response.json();
+        filteredBooks = books;
+        displayBooks();
+      } catch (err) {
+        console.error('Error loading books:', err);
+      }
+    }
+
+    // Display Books
+    function displayBooks() {
+      const fictionSection = document.getElementById('fictionSection');
+      const nonFictionSection = document.getElementById('nonFictionSection');
+      const comedySection = document.getElementById('comedySection');
+      const youngAdultSection = document.getElementById('youngAdultSection');
+      const romanceSection = document.getElementById('romanceSection');
+      const famousBooksSection = document.getElementById('famousBooksSection');
+
+      fictionSection.innerHTML = '';
+      nonFictionSection.innerHTML = '';
+      comedySection.innerHTML = '';
+      youngAdultSection.innerHTML = '';
+      romanceSection.innerHTML = '';
+      famousBooksSection.innerHTML = '';
+
+      filteredBooks.forEach(book => {
+        const card = document.createElement('div');
+        card.className = 'book-card bg-white p-4 rounded-lg shadow-md';
+        card.innerHTML = `
+          <img src="${book.image_url}" alt="${book.name}" class="w-full h-48 object-cover mb-2 rounded">
+          <h4 class="text-lg font-semibold truncate">${book.name}</h4>
+          <p><strong>Author:</strong> ${book.author}</p>
+          <p><strong>Genre:</strong> ${book.genre}</p>
+          <p><strong>Price:</strong> <span class="book-price" data-inr="${book.price}">${book.price} INR</span> (Discount: ${book.discount}%)</p>
+          <p><strong>Rating:</strong> ${book.rating}/5</p>
+          <p><strong>Description:</strong> ${book.description}</p>
+          <button class="add-to-cart bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mt-2 w-full transition duration-200" data-id="${book.id}">Add to Cart</button>
+        `;
+
+        const genreLower = book.genre.toLowerCase();
+        if (genreLower === 'fiction') {
+          fictionSection.appendChild(card);
+        } else if (genreLower === 'non-fiction') {
+          nonFictionSection.appendChild(card);
+        } else if (genreLower === 'comedy') {
+          comedySection.appendChild(card);
+        } else if (genreLower === 'young adult') {
+          youngAdultSection.appendChild(card);
+        } else if (genreLower === 'romance') {
+          romanceSection.appendChild(card);
+        } else {
+          famousBooksSection.appendChild(card);
+        }
+      });
+
+      updatePrices();
+      addCartListeners();
+    }
+
+    // Search Functionality
+    searchBar.addEventListener('input', () => {
+      const query = searchBar.value.toLowerCase();
+      filteredBooks = books.filter(book =>
+        book.name.toLowerCase().includes(query) ||
+        book.author.toLowerCase().includes(query) ||
+        book.genre.toLowerCase().includes(query)
+      );
+      displayBooks();
+    });
+
+    // Currency Conversion
+    document.getElementById('currencySelect').addEventListener('change', (e) => {
+      selectedCountry = e.target.value;
+      updatePrices();
+      updateCart();
+    });
+
+    function updatePrices() {
+      const prices = document.querySelectorAll('.book-price');
+      const rate = exchangeRates[selectedCountry].rate;
+      const currency = exchangeRates[selectedCountry].currency;
+
+      prices.forEach(price => {
+        const inrPrice = parseFloat(price.dataset.inr);
+        const convertedPrice = (inrPrice * rate).toFixed(2);
+        price.textContent = `${convertedPrice} ${currency}`;
+      });
+    }
+
+    // Cart Functionality
+    function addCartListeners() {
+      document.querySelectorAll('.add-to-cart').forEach(button => {
+        button.addEventListener('click', async () => {
+          if (!currentUser) {
+            alert('Please login to add items to your cart.');
+            showPage(loginPage);
+            return;
+          }
+
+          const bookId = parseInt(button.dataset.id);
+          const book = books.find(b => b.id === bookId);
+          const cartItem = cart.find(item => item.item_id === bookId);
+
+          if (cartItem) {
+            cartItem.amount += 1;
+          } else {
+            cart.push({ item_id: bookId, amount: 1, book });
+          }
+
+          localStorage.setItem('cart', JSON.stringify(cart));
+          button.textContent = 'Added';
+          button.disabled = true;
+          setTimeout(() => {
+            button.textContent = 'Add to Cart';
+            button.disabled = false;
+          }, 2000);
+
+          try {
+            await fetch('http://localhost:5000/api/cart', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ customer_id: currentUser.email_id, item_id: bookId, amount: cartItem ? cartItem.amount : 1 })
+            });
+            updateCart();
+          } catch (err) {
+            console.error('Error adding to cart:', err);
+          }
+        });
+      });
+    }
+
+    async function loadCart() {
+      if (!currentUser) return;
+
+      try {
+        const response = await fetch(`http://localhost:5000/api/cart/${currentUser.email_id}`);
+        const backendCart = await response.json();
+        cart = backendCart.map(item => ({
+          ...item,
+          book: books.find(b => b.id === item.item_id)
+        }));
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCart();
+      } catch (err) {
+        console.error('Error loading cart:', err);
+      }
+    }
+
+    function updateCart() {
+      const cartEmpty = document.getElementById('cartEmpty');
+      const cartItems = document.getElementById('cartItems');
+      const cartTotal = document.getElementById('cartTotal');
+      const totalAmount = document.getElementById('totalAmount');
+      const paymentOptions = document.getElementById('paymentOptions');
+      const placeOrderBtn = document.getElementById('placeOrderBtn');
+      const cartCount = document.getElementById('cartCount');
+
+      if (cart.length === 0) {
+        cartEmpty.classList.remove('hidden');
+        cartItems.classList.add('hidden');
+        cartTotal.classList.add('hidden');
+        paymentOptions.classList.add('hidden');
+        placeOrderBtn.classList.add('hidden');
+        cartCount.textContent = '0';
+        return;
+      }
+
+      cartEmpty.classList.add('hidden');
+      cartItems.classList.remove('hidden');
+      cartTotal.classList.remove('hidden');
+      paymentOptions.classList.remove('hidden');
+      placeOrderBtn.classList.remove('hidden');
+
+      cartItems.innerHTML = '';
+      let total = 0;
+      const rate = exchangeRates[selectedCountry].rate;
+      const currency = exchangeRates[selectedCountry].currency;
+
+      cart.forEach((item, index) => {
+        const discountedPrice = item.book.price * (1 - item.book.discount / 100);
+        const itemTotal = discountedPrice * item.amount;
+        total += itemTotal;
+
+        const div = document.createElement('div');
+        div.className = 'cart-item flex justify-between items-center';
+        div.innerHTML = `
+          <div>
+            <p class="font-semibold">${item.book.name} (x${item.amount})</p>
+            <p class="text-gray-600">${(itemTotal * rate).toFixed(2)} ${currency}</p>
+          </div>
+          <button class="remove-from-cart bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200" data-index="${index}">Remove</button>
+        `;
+        cartItems.appendChild(div);
+      });
+
+      totalAmount.textContent = `${(total * rate).toFixed(2)} ${currency}`;
+      cartCount.textContent = cart.reduce((sum, item) => sum + item.amount, 0);
+
+      document.querySelectorAll('.remove-from-cart').forEach(button => {
+        button.addEventListener('click', async () => {
+          const index = parseInt(button.dataset.index);
+          const item = cart[index];
+
+          try {
+            await fetch('http://localhost:5000/api/cart', {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ customer_id: currentUser.email_id, item_id: item.item_id })
+            });
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCart();
+          } catch (err) {
+            console.error('Error removing from cart:', err);
+          }
+        });
+      });
+
+      // Ensure the payment method display is updated after cart update
+      const paymentMethodSelect = document.getElementById('paymentMethod');
+      paymentMethodSelect.dispatchEvent(new Event('change'));
+    }
+
+    // Payment Method Selection
+    const paymentMethodSelect = document.getElementById('paymentMethod');
+    const paymentDetails = document.querySelectorAll('.payment-details');
+    paymentMethodSelect.addEventListener('change', (e) => {
+      paymentDetails.forEach(detail => detail.classList.add('hidden'));
+      const selectedMethod = e.target.value;
+      const selectedDetail = document.getElementById(`${selectedMethod}Details`);
+      selectedDetail.classList.remove('hidden');
+
+      // Reset QR code visibility in case it failed to load previously
+      if (selectedMethod === 'googlepay') {
+        const qrImage = selectedDetail.querySelector('img');
+        const qrError = selectedDetail.querySelector('.qr-code-error');
+        qrImage.style.display = 'block';
+        qrError.style.display = 'none';
+      }
+    });
+
+    // Place Order
+    document.getElementById('placeOrderBtn').addEventListener('click', async () => {
+      if (!currentUser || cart.length === 0) {
+        alert('Your cart is empty or you are not signed in.');
+        return;
+      }
+
+      const paymentMethod = paymentMethodSelect.value;
+      let paymentDetails = {};
+      let transactionDetails = null;
+
+      const paymentResult = document.getElementById('paymentResult');
+      const paymentStatus = document.getElementById('paymentStatus');
+      const statusBadge = document.getElementById('statusBadge');
+      const confirmPaymentSection = document.getElementById('confirmPaymentSection');
+      const confirmPaymentBtn = document.getElementById('confirmPaymentBtn');
+      const timerElement = document.getElementById('timer');
+      const generateReceiptBtn = document.getElementById('generateReceiptBtn');
+      const receiptDetails = document.getElementById('receiptDetails');
+
+      // Reset result section
+      paymentResult.classList.add('hidden');
+      confirmPaymentSection.classList.add('hidden');
+      generateReceiptBtn.classList.add('hidden');
+      receiptDetails.classList.add('hidden');
+      paymentStatus.textContent = '';
+      statusBadge.textContent = '';
+      statusBadge.className = 'inline-block px-3 py-1 rounded-full text-sm font-semibold';
+
+      const total = cart.reduce((sum, item) => {
+        const discountedPrice = item.book.price * (1 - item.book.discount / 100);
+        return sum + discountedPrice * item.amount;
+      }, 0);
+
+      // Set payment details based on method
+      if (paymentMethod === 'googlepay') {
+        paymentDetails = { method: 'Google Pay', details: 'Payment via QR code' };
+      } else if (paymentMethod === 'creditcard') {
+        const cardNumber = document.getElementById('creditCardNumber').value;
+        const cardExpiry = document.getElementById('creditCardExpiry').value;
+        const cardCvv = document.getElementById('creditCardCvv').value;
+        if (!cardNumber || !cardExpiry || !cardCvv) {
+          alert('Please fill in all Credit Card details.');
+          return;
+        }
+        paymentDetails = { method: 'Credit Card', cardNumber, cardExpiry, cardCvv };
+      } else if (paymentMethod === 'debitcard') {
+        const cardNumber = document.getElementById('debitCardNumber').value;
+        const cardExpiry = document.getElementById('debitCardExpiry').value;
+        const cardCvv = document.getElementById('debitCardCvv').value;
+        if (!cardNumber || !cardExpiry || !cardCvv) {
+          alert('Please fill in all Debit Card details.');
+          return;
+        }
+        paymentDetails = { method: 'Debit Card', cardNumber, cardExpiry, cardCvv };
+      }
+
+      try {
+        console.log('Sending checkout request with payload:', {
+          customer_id: currentUser.email_id,
+          amount: total,
+          payment_method: paymentDetails.method,
+          card_no: paymentDetails.cardNumber || 'N/A',
+          bill_address: currentUser.address
+        });
+        const response = await fetch('http://localhost:5000/api/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customer_id: currentUser.email_id,
+            amount: total,
+            payment_method: paymentDetails.method,
+            card_no: paymentDetails.cardNumber || 'N/A',
+            bill_address: currentUser.address
+          })
+        });
+
+        console.log('Checkout response status:', response.status);
+        console.log('Checkout response headers:', response.headers.get('Content-Type'));
+
+        const data = await response.json();
+        console.log('Checkout response data:', data);
+
+        if (!response.ok) {
+          console.error('Response not OK. Status:', response.status, 'Data:', data);
+          throw new Error(data.message || 'Checkout failed.');
+        }
+
+        if (!data.transaction) {
+          console.error('Transaction data missing in response:', data);
+          throw new Error('Transaction details not found in response');
+        }
+
+        transactionDetails = data.transaction;
+        localStorage.setItem('lastTransaction', JSON.stringify(transactionDetails));
+
+        if (paymentMethod === 'googlepay') {
+          paymentResult.classList.remove('hidden');
+          confirmPaymentSection.classList.remove('hidden');
+          paymentStatus.textContent = 'Waiting for payment confirmation...';
+
+          let timeLeft = 30;
+          timerElement.textContent = timeLeft;
+          let paymentConfirmed = false;
+
+          const timer = setInterval(() => {
+            timeLeft--;
+            timerElement.textContent = timeLeft;
+            if (timeLeft <= 0) {
+              clearInterval(timer);
+              if (!paymentConfirmed) {
+                paymentStatus.textContent = 'Payment Failed: Payment not completed within the time limit.';
+                statusBadge.textContent = 'Payment Failed';
+                statusBadge.classList.add('bg-red-100', 'text-red-800');
+                confirmPaymentSection.classList.add('hidden');
+                generateReceiptBtn.classList.remove('hidden');
+                transactionDetails.status = 'failed';
+                transactionDetails.failure_reason = 'Payment not completed within the time limit.';
+                localStorage.setItem('lastTransaction', JSON.stringify(transactionDetails));
+              }
+            }
+          }, 1000);
+
+          confirmPaymentBtn.addEventListener('click', () => {
+            clearInterval(timer);
+            paymentConfirmed = true;
+            paymentStatus.textContent = 'Transaction Payment Successful!';
+            statusBadge.textContent = 'Payment Successful';
+            statusBadge.classList.add('bg-green-100', 'text-green-800');
+            confirmPaymentSection.classList.add('hidden');
+            generateReceiptBtn.classList.remove('hidden');
+            transactionDetails.status = 'success';
+            localStorage.setItem('lastTransaction', JSON.stringify(transactionDetails));
+            cart = [];
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCart();
+          }, { once: true });
+        } else {
+          paymentResult.classList.remove('hidden');
+          paymentStatus.textContent = `Transaction Payment Successful! Payment via ${paymentDetails.method}.`;
+          statusBadge.textContent = 'Payment Successful';
+          statusBadge.classList.add('bg-green-100', 'text-green-800');
+          generateReceiptBtn.classList.remove('hidden');
+          transactionDetails.status = 'success';
+          localStorage.setItem('lastTransaction', JSON.stringify(transactionDetails));
+          cart = [];
+          localStorage.setItem('cart', JSON.stringify(cart));
+          updateCart();
+        }
+      } catch (err) {
+        console.error('Error during order placement:', err);
+        paymentResult.classList.remove('hidden');
+        paymentStatus.textContent = `Payment Failed: ${err.message}`;
+        statusBadge.textContent = 'Payment Failed';
+        statusBadge.classList.add('bg-red-100', 'text-red-800');
+        generateReceiptBtn.classList.remove('hidden');
+        if (transactionDetails) {
+          transactionDetails.status = 'failed';
+          transactionDetails.failure_reason = err.message;
+          localStorage.setItem('lastTransaction', JSON.stringify(transactionDetails));
+        }
+      }
+    });
+
+    // Add the receipt generation event listener
+    document.getElementById('generateReceiptBtn').addEventListener('click', async () => {
+      const receiptDetails = document.getElementById('receiptDetails');
+      const transactionDetails = JSON.parse(localStorage.getItem('lastTransaction'));
+      const timeLimit = new Date(transactionDetails?.transaction_date);
+      const currentTime = new Date();
+      const timeDifference = (currentTime - timeLimit) / 1000; // Convert to seconds
+
+      if (!transactionDetails) {
+        receiptDetails.innerHTML = '<p class="text-red-500">No transaction details available.</p>';
+        receiptDetails.classList.remove('hidden');
+        return;
+      }
+
+      try {
+        // Update the status based on time limit for Google Pay
+        if (transactionDetails.payment_method === 'Google Pay' && timeDifference > 30) {
+          await fetch('http://localhost:5000/api/receipt/update-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              transaction_id: transactionDetails.transaction_id,
+              payment_status: 'failed',
+              failure_reason: 'Payment time limit exceeded'
+            })
+          });
+        }
+
+        const response = await fetch(`http://localhost:5000/api/receipt/${transactionDetails.transaction_id}`);
+        const data = await response.json();
+        
+        if (response.ok) {
+          const receipt = data.receipt;
+          const rate = exchangeRates[selectedCountry].rate;
+          const currency = exchangeRates[selectedCountry].currency;
+          const convertedAmount = (receipt.amount * rate).toFixed(2);
+          
+          // Enhanced receipt display with prominent status
+          receiptDetails.innerHTML = `
+            <div class="space-y-4 p-6 bg-white rounded-lg shadow-sm">
+              <div class="text-center border-b pb-4">
+                <h4 class="font-bold text-xl mb-2">Payment Receipt</h4>
+                <div class="inline-block px-4 py-2 rounded-full text-sm font-bold ${
+                  receipt.status === 'success' 
+                    ? 'bg-green-100 text-green-800 border-2 border-green-200' 
+                    : 'bg-red-100 text-red-800 border-2 border-red-200'
+                }">
+                  ${receipt.status === 'success' ? '✓ Payment Successful' : ' Payment success'}
+                </div>
+              </div>
+              
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div class="space-y-2">
+                  <p><span class="font-semibold">Receipt ID:</span> ${receipt.receipt_id}</p>
+                  <p><span class="font-semibold">Transaction ID:</span> ${receipt.transaction_id}</p>
+                  <p><span class="font-semibold">Payment Method:</span> ${receipt.payment_method}</p>
+                  <p><span class="font-semibold">Amount:</span> ${convertedAmount} ${currency}</p>
+                </div>
+                <div class="space-y-2">
+                  <p><span class="font-semibold">Date:</span> ${new Date(receipt.transaction_date).toLocaleString()}</p>
+                  <p><span class="font-semibold">Billing Address:</span> ${receipt.bill_address}</p>
+                  ${receipt.status === 'failed' 
+                    ? `<p class="text-red-600"><span class="font-semibold">Failure Reason:</span> ${receipt.failure_reason}</p>` 
+                    : ''}
+                </div>
+              </div>
+
+              <div class="mt-4 pt-4 border-t text-center">
+                <p class="text-sm text-gray-600">Thank you for shopping with us!</p>
+              </div>
+            </div>
+          `;
+          
+          receiptDetails.classList.remove('hidden');
+        } else {
+          receiptDetails.innerHTML = `
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p class="text-red-600">Error fetching receipt: ${data.message}</p>
+            </div>
+          `;
+          receiptDetails.classList.remove('hidden');
+        }
+      } catch (err) {
+        console.error('Error fetching receipt:', err);
+        receiptDetails.innerHTML = `
+          <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+            <p class="text-red-600">Error fetching receipt. Please try again.</p>
+          </div>
+        `;
+        receiptDetails.classList.remove('hidden');
+      }
+    });
+
+    // Initial Load
+    if (currentUser) {
+      showLoginBtn.classList.add('hidden');
+      showRegisterBtn.classList.add('hidden');
+      logoutBtn.classList.remove('hidden');
+      userGreeting.textContent = `Welcome, ${currentUser.first_name}!`;
+      userGreeting.classList.remove('hidden');
+      showPage(booksPage);
+    }
+    loadBooks();
+
+    // Trigger payment method change on initial load if cart is not empty
+    document.addEventListener('DOMContentLoaded', () => {
+      if (cart.length > 0) {
+        document.getElementById('paymentMethod').dispatchEvent(new Event('change'));
+      }
+    });
+  </script>
 </body>
 </html>
