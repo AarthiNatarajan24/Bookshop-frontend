@@ -1,34 +1,1120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Books | Bookshop</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Books - Aarthi's Bookshop</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #e0f7fa, #b2ebf2);
+      min-height: 100vh;
+    }
+    .navbar {
+      background-color: #4a90e2;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .navbar h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .navbar button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+    .sign-in-btn {
+      background-color: #f5a623;
+      color: white;
+    }
+    .sign-in-btn:hover {
+      background-color: #e69520;
+    }
+    .sign-up-btn {
+      background-color: #28a745;
+      color: white;
+    }
+    .sign-up-btn:hover {
+      background-color: #218838;
+    }
+    .logout-btn {
+      background-color: #dc3545;
+      color: white;
+    }
+    .logout-btn:hover {
+      background-color: #c82333;
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      gap: 20px;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .controls input, .controls select {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+      width: 200px;
+    }
+    .controls select {
+      width: 220px;
+    }
+    .genre-section {
+      margin: 20px;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .genre-section h2 {
+      font-size: 28px;
+      color: #333;
+      border-bottom: 2px solid #4a90e2;
+      padding-bottom: 5px;
+      margin-bottom: 15px;
+      transition: color 0.3s;
+    }
+    .genre-section h2:hover {
+      color: #4a90e2;
+    }
+    .books-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+    }
+    .book-card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      width: 200px;
+      margin: 10px;
+      padding: 15px;
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .book-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    .book-card img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    .book-card h3 {
+      font-size: 18px;
+      margin: 10px 0;
+    }
+    .book-card p {
+      font-size: 14px;
+      color: #333;
+      margin: 5px 0;
+    }
+    .book-card .genre {
+      font-style: italic;
+      color: #6b7280;
+    }
+    .book-card .price {
+      font-weight: bold;
+      color: #e74c3c;
+    }
+    .book-card .reviews {
+      color: #f39c12;
+    }
+    .book-card button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+      width: 100%;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+    .book-card button:hover {
+      background-color: #218838;
+    }
+    .book-card .wishlist-btn {
+      background-color: #ff6f61;
+      margin-top: 5px;
+    }
+    .book-card .wishlist-btn:hover {
+      background-color: #e65a50;
+    }
+    .review-form {
+      margin-top: 10px;
+      text-align: left;
+    }
+    .review-form select, .review-form textarea {
+      width: 100%;
+      padding: 5px;
+      margin: 5px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .review-form button {
+      background-color: #4a90e2;
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+    .review-form button:hover {
+      background-color: #357abd;
+    }
+    .review-list {
+      margin-top: 10px;
+      text-align: left;
+      max-height: 100px;
+      overflow-y: auto;
+      font-size: 12px;
+    }
+    .review-list p {
+      margin: 5px 0;
+    }
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px;
+    }
+    .pagination button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background-color: #4a90e2;
+      color: white;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+    .pagination button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    .pagination button:hover:not(:disabled) {
+      background-color: #357abd;
+    }
+    .cart-section, .wishlist-section {
+      margin: 20px;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .cart-section h2, .wishlist-section h2 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 15px;
+    }
+    .cart-item, .wishlist-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .cart-item:last-child, .wishlist-item:last-child {
+      border-bottom: none;
+    }
+    .cart-item button, .wishlist-item button {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background-color 0.3s;
+    }
+    .cart-item button:hover, .wishlist-item button:hover {
+      background-color: #c82333;
+    }
+    .quantity-controls button {
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background-color 0.3s;
+    }
+    .quantity-controls button:hover {
+      background-color: #357abd;
+    }
+    .cart-total {
+      font-weight: bold;
+      font-size: 18px;
+      color: #e74c3c;
+      margin-top: 10px;
+      text-align: right;
+    }
+    .view-cart-btn {
+      display: block;
+      margin: 10px 0 0 auto;
+      padding: 10px 20px;
+      background-color: #f5a623;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    .view-cart-btn:hover {
+      background-color: #e69520;
+    }
+    .wishlist-item img {
+      width: 50px;
+      height: 75px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    .checkout-form {
+      margin-top: 20px;
+      padding: 10px;
+      border-top: 1px solid #eee;
+    }
+    .checkout-form label {
+      margin-right: 10px;
+    }
+    .checkout-form select,
+    .checkout-form input {
+      padding: 5px;
+      margin: 5px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 200px;
+    }
+    .checkout-form button {
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+    .checkout-form button:hover {
+      background-color: #357abd;
+    }
+    .checkout-result {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+    }
+    .checkout-result h3 {
+      margin-top: 0;
+    }
+    .checkout-result img {
+      width: 200px;
+      height: 200px;
+      margin-top: 10px;
+    }
+    .error-message {
+      color: #dc3545;
+      margin-top: 10px;
+    }
+    /* QR Code Container Styling */
+    #qrCodeContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 15px;
+      margin-top: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      max-width: 300px;
+      width: 100%;
+      transition: transform 0.3s;
+    }
+    #qrCodeContainer:hover {
+      transform: translateY(-5px);
+    }
+    #qrCodeContainer img {
+      width: 150px;
+      height: 150px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 5px;
+      background-color: #f9f9f9;
+    }
+    #qrCodeContainer h4 {
+      font-size: 18px;
+      font-weight: bold;
+      color: #545050;
+      margin-bottom: 5px;
+      text-align: center;
+    }
+    @media (max-width: 640px) {
+      #qrCodeContainer {
+        padding: 10px;
+        max-width: 250px;
+      }
+      #qrCodeContainer img {
+        width: 120px;
+        height: 120px;
+      }
+      #qrCodeContainer h4 {
+        font-size: 16px;
+      }
+    }
+    /* Additional styles for payment confirmation and receipt */
+    .payment-status {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .payment-status.success {
+      color: #28a745;
+    }
+    .payment-status.failed {
+      color: #dc3545;
+    }
+    .confirm-payment-section {
+      margin-bottom: 10px;
+    }
+    .confirm-payment-btn {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+    .confirm-payment-btn:hover {
+      background-color: #218838;
+    }
+    .generate-receipt-btn {
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+    .generate-receipt-btn:hover {
+      background-color: #357abd;
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>📖 Browse Books</h1>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="books.html">Books</a>
-      <a href="cart.html">Cart</a>
-      <a href="login.html">Login</a>
-    </nav>
-  </header>
-
-  <main>
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Search books by title or author..." onkeyup="searchBooks()" />
-      </div>
-      
-    <div id="book-list" class="book-grid">
-      <!-- Book cards will be inserted by JS -->
+  <!-- Navigation Bar -->
+  <div class="navbar">
+    <button id="signInBtn" class="sign-in-btn" onclick="window.location.href='index.html'">Sign in</button>
+    <h1>Books - Aarthi's Bookshop</h1>
+    <div>
+      <button id="signUpBtn" class="sign-up-btn" onclick="window.location.href='register.html'">Sign Up</button>
+      <button id="logoutBtn" class="logout-btn hidden" onclick="logout()">Logout</button>
     </div>
-  </main>
+  </div>
 
-  <footer>
-    <p>&copy; 2025 Bookshop Automation</p>
-  </footer>
-  <script src="script.js"></script>
+  <!-- Search, Filter, and Sort Controls -->
+  <div class="controls">
+    <input type="text" id="searchBar" placeholder="Search by title or author..." onkeyup="filterBooks()">
+    <select id="genreFilter" onchange="filterBooks()">
+      <option value="all">All Genres</option>
+      <option value="Horror">Horror</option>
+      <option value="Thriller">Thriller</option>
+      <option value="Mystery">Mystery</option>
+      <option value="Romance">Romance</option>
+      <option value="Self-Help">Self-Help</option>
+      <option value="Fantasy">Fantasy</option>
+      <option value="Dystopian">Dystopian</option>
+      <option value="Fiction">Fiction</option>
+      <option value="Non-Fiction">Non-Fiction</option>
+      <option value="Comedy">Comedy</option>
+    </select>
+    <select id="sortFilter" onchange="filterBooks()">
+      <option value="none">Sort By</option>
+      <option value="price-asc">Price: Low to High</option>
+      <option value="price-desc">Price: High to Low</option>
+      <option value="rating-desc">Rating: High to Low</option>
+      <option value="rating-asc">Rating: Low to High</option>
+    </select>
+  </div>
+
+  <!-- Books Sections by Genre -->
+  <div id="genresContainer"></div>
+
+  <!-- Pagination Controls -->
+  <div class="pagination">
+    <button id="prevPage" onclick="changePage(-1)" disabled>Previous</button>
+    <button id="nextPage" onclick="changePage(1)">Next</button>
+  </div>
+
+  <!-- Cart Section -->
+  <div id="cartSection" class="cart-section" style="display: none;">
+    <h2>My Cart</h2>
+    <div id="cartItems"></div>
+    <div id="cartTotal" class="cart-total"></div>
+    <button class="view-cart-btn" onclick="window.location.href='cart.html'">View Cart</button>
+    <!-- Checkout Form -->
+    <div class="checkout-form">
+      <h3>Checkout</h3>
+      <div>
+        <label for="paymentMethod">Payment Method:</label>
+        <select id="paymentMethod">
+          <option value="Google Pay">Google Pay</option>
+          <option value="Credit Card">Credit Card</option>
+          <option value="Debit Card">Debit Card</option>
+        </select>
+      </div>
+      <div id="cardDetails" style="display: none;">
+        <label for="cardNo">Card Number:</label>
+        <input type="text" id="cardNo" placeholder="Enter card number">
+        <label for="cardExpiry">Expiry Date:</label>
+        <input type="text" id="cardExpiry" placeholder="MM/YY">
+        <label for="cardCvv">CVV:</label>
+        <input type="text" id="cardCvv" placeholder="123">
+      </div>
+      <div>
+        <label for="billAddress">Billing Address:</label>
+        <input type="text" id="billAddress" placeholder="Enter billing address">
+      </div>
+      <button id="placeOrderBtn" onclick="placeOrder()">Proceed to Payment</button>
+    </div>
+    <!-- Checkout Result -->
+    <div id="checkoutResult" class="checkout-result" style="display: none;">
+      <h3>Payment Result</h3>
+      <p id="paymentStatus" class="payment-status"></p>
+      <div id="confirmPaymentSection" class="confirm-payment-section" style="display: none;">
+        <p>Please confirm payment within <span id="timer">30</span> seconds.</p>
+        <button id="confirmPaymentBtn" class="confirm-payment-btn">Confirm Payment</button>
+      </div>
+      <button id="generateReceiptBtn" class="generate-receipt-btn" style="display: none;">Generate Receipt</button>
+      <div id="receiptDetails"></div>
+      <div id="qrCodeContainer"></div>
+      <div id="errorMessage" class="error-message"></div>
+    </div>
+  </div>
+
+  <!-- Wishlist Section -->
+  <div id="wishlistSection" class="wishlist-section" style="display: none;">
+    <h2>My Wishlist</h2>
+    <div id="wishlistItems"></div>
+  </div>
+
+  <script>
+    let books = [];
+    let filteredBooks = [];
+    let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+    const booksPerPage = 10;
+    let currentPage = 1;
+
+    // Update navbar based on user login status
+    const signInBtn = document.getElementById('signInBtn');
+    const signUpBtn = document.getElementById('signUpBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (currentUser) {
+      signInBtn.classList.add('hidden');
+      signUpBtn.classList.add('hidden');
+      logoutBtn.classList.remove('hidden');
+    }
+
+    // Load Books
+    async function loadBooks() {
+      try {
+        const response = await fetch('http://localhost:5000/api/books');
+        books = await response.json();
+        filterBooks();
+        displayCart();
+        if (currentUser) {
+          loadWishlist();
+        }
+      } catch (err) {
+        console.error('Error loading books:', err);
+      }
+    }
+
+    // Filter and Sort Books
+    function filterBooks() {
+      const searchQuery = document.getElementById('searchBar').value.toLowerCase();
+      const selectedGenre = document.getElementById('genreFilter').value;
+      const sortOption = document.getElementById('sortFilter').value;
+
+      // Filter books
+      filteredBooks = books.filter(book => {
+        const matchesSearch = book.name.toLowerCase().includes(searchQuery) || book.author.toLowerCase().includes(searchQuery);
+        const matchesGenre = selectedGenre === 'all' || book.genre === selectedGenre;
+        return matchesSearch && matchesGenre;
+      });
+
+      // Sort books
+      if (sortOption === 'price-asc') {
+        filteredBooks.sort((a, b) => a.price - b.price);
+      } else if (sortOption === 'price-desc') {
+        filteredBooks.sort((a, b) => b.price - a.price);
+      } else if (sortOption === 'rating-desc') {
+        filteredBooks.sort((a, b) => b.rating - a.rating);
+      } else if (sortOption === 'rating-asc') {
+        filteredBooks.sort((a, b) => a.rating - b.rating);
+      }
+
+      currentPage = 1; // Reset to first page on filter/sort
+      displayBooksByGenre();
+      updatePagination();
+    }
+
+    // Group and Display Books by Genre
+    async function displayBooksByGenre() {
+      const genresContainer = document.getElementById('genresContainer');
+      genresContainer.innerHTML = '';
+
+      // Paginate filtered books
+      const startIndex = (currentPage - 1) * booksPerPage;
+      const endIndex = startIndex + booksPerPage;
+      const paginatedBooks = filteredBooks.slice(startIndex, endIndex);
+
+      // Group books by genre
+      const booksByGenre = {};
+      paginatedBooks.forEach(book => {
+        if (!booksByGenre[book.genre]) {
+          booksByGenre[book.genre] = [];
+        }
+        booksByGenre[book.genre].push(book);
+      });
+
+      // Create a section for each genre
+      for (const genre in booksByGenre) {
+        const genreSection = document.createElement('div');
+        genreSection.className = 'genre-section';
+        genreSection.innerHTML = `<h2>${genre}</h2>`;
+        const booksContainer = document.createElement('div');
+        booksContainer.className = 'books-container';
+
+        // Add books to the genre section
+        for (const book of booksByGenre[genre]) {
+          // Fetch reviews for the book
+          const response = await fetch(`http://localhost:5000/api/reviews/${book.id}`);
+          const reviews = await response.json();
+
+          const card = document.createElement('div');
+          card.className = 'book-card';
+          card.innerHTML = `
+            <img src="${book.image_url}" alt="${book.name}">
+            <h3>${book.name}</h3>
+            <p>Author: ${book.author}</p>
+            <p class="genre">Genre: ${book.genre}</p>
+            <p class="price">Price: ₹${book.price}</p>
+            <p>Description: ${book.description}</p>
+            <p class="reviews">Average Rating: ${book.rating} ★</p>
+            <button onclick="addToCart(${book.id})">Add to Cart 🛒</button>
+            <button class="wishlist-btn" onclick="addToWishlist(${book.id})">Add to Wishlist ❤️</button>
+            <div class="review-form">
+              <select id="rating-${book.id}">
+                <option value="1">1 ★</option>
+                <option value="2">2 ★</option>
+                <option value="3">3 ★</option>
+                <option value="4">4 ★</option>
+                <option value="5">5 ★</option>
+              </select>
+              <textarea id="comment-${book.id}" placeholder="Write your review..." rows="2"></textarea>
+              <button onclick="submitReview(${book.id})">Submit Review</button>
+            </div>
+            <div class="review-list">
+              ${reviews.map(r => `<p>${r.rating} ★: ${r.comment || 'No comment'}</p>`).join('')}
+            </div>
+          `;
+          booksContainer.appendChild(card);
+        }
+
+        genreSection.appendChild(booksContainer);
+        genresContainer.appendChild(genreSection);
+      }
+    }
+
+    // Update Pagination Controls
+    function updatePagination() {
+      const prevPageBtn = document.getElementById('prevPage');
+      const nextPageBtn = document.getElementById('nextPage');
+      const totalPages = Math.ceil(filteredBooks.length / booksPerPage);
+
+      prevPageBtn.disabled = currentPage === 1;
+      nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
+    }
+
+    // Change Page
+    function changePage(direction) {
+      currentPage += direction;
+      displayBooksByGenre();
+      updatePagination();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Add to Cart
+    async function addToCart(bookId) {
+      if (!currentUser) {
+        alert('Please sign in to add items to your cart.');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      try {
+        await fetch('http://localhost:5000/api/cart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ customer_id: currentUser.email_id, item_id: bookId, amount: 1 })
+        });
+
+        // Add book to local cart for display
+        const book = books.find(b => b.id === bookId);
+        const cartItem = cart.find(item => item.id === bookId);
+        if (cartItem) {
+          cartItem.quantity += 1;
+        } else {
+          cart.push({ id: bookId, name: book.name, price: book.price, quantity: 1 });
+        }
+        localStorage.setItem('cart', JSON.stringify(cart));
+        displayCart();
+      } catch (err) {
+        console.error('Error adding to cart:', err);
+        alert('Error adding to cart.');
+      }
+    }
+
+    // Update Quantity
+    function updateQuantity(bookId, change) {
+      const cartItem = cart.find(item => item.id === bookId);
+      if (cartItem) {
+        cartItem.quantity += change;
+        if (cartItem.quantity <= 0) {
+          removeFromCart(bookId);
+          return;
+        }
+        localStorage.setItem('cart', JSON.stringify(cart));
+        displayCart();
+
+        // Update backend cart
+        fetch('http://localhost:5000/api/cart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ customer_id: currentUser.email_id, item_id: bookId, amount: cartItem.quantity })
+        }).catch(err => console.error('Error updating cart:', err));
+      }
+    }
+
+    // Remove from Cart
+    function removeFromCart(bookId) {
+      cart = cart.filter(item => item.id !== bookId);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      displayCart();
+
+      // Remove from backend cart
+      fetch('http://localhost:5000/api/cart', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customer_id: currentUser.email_id, item_id: bookId })
+      }).catch(err => console.error('Error removing from cart:', err));
+    }
+
+    // Display Cart
+    function displayCart() {
+      const cartSection = document.getElementById('cartSection');
+      const cartItemsDiv = document.getElementById('cartItems');
+      const cartTotalDiv = document.getElementById('cartTotal');
+
+      if (cart.length === 0) {
+        cartSection.style.display = 'none';
+        return;
+      }
+
+      cartSection.style.display = 'block';
+      cartItemsDiv.innerHTML = '';
+      let total = 0;
+
+      cart.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+        const cartItem = document.createElement('div');
+        cartItem.className = 'cart-item';
+        cartItem.innerHTML = `
+          <span>${item.name}</span>
+          <div class="quantity-controls">
+            <button onclick="updateQuantity(${item.id}, -1)">-</button>
+            <span>${item.quantity}</span>
+            <button onclick="updateQuantity(${item.id}, 1)">+</button>
+          </div>
+          <span>₹${itemTotal}</span>
+          <button onclick="removeFromCart(${item.id})">Remove</button>
+        `;
+        cartItemsDiv.appendChild(cartItem);
+      });
+
+      cartTotalDiv.textContent = `Total: ₹${total}`;
+      cartTotalDiv.dataset.total = total; // Store total for checkout
+    }
+
+    // Toggle Card Details Visibility
+    document.getElementById('paymentMethod').addEventListener('change', function() {
+      const cardDetails = document.getElementById('cardDetails');
+      cardDetails.style.display = this.value === 'Google Pay' ? 'none' : 'block';
+    });
+
+    // Place Order
+    async function placeOrder() {
+      if (!currentUser || cart.length === 0) {
+        alert('Please sign in or add items to your cart to proceed with checkout.');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      const paymentMethod = document.getElementById('paymentMethod').value;
+      const billAddress = document.getElementById('billAddress').value;
+      const cartTotal = document.getElementById('cartTotal').dataset.total;
+
+      if (!billAddress) {
+        alert('Please enter a billing address.');
+        return;
+      }
+
+      let paymentDetails = {};
+      if (paymentMethod === 'Google Pay') {
+        paymentDetails = { method: 'Google Pay', details: 'Payment via QR code' };
+      } else if (paymentMethod === 'Credit Card') {
+        const cardNumber = document.getElementById('cardNo').value;
+        const cardExpiry = document.getElementById('cardExpiry').value;
+        const cardCvv = document.getElementById('cardCvv').value;
+        if (!cardNumber || !cardExpiry || !cardCvv) {
+          alert('Please fill in all Credit Card details.');
+          return;
+        }
+        paymentDetails = { method: 'Credit Card', cardNumber, cardExpiry, cardCvv };
+      } else if (paymentMethod === 'Debit Card') {
+        const cardNumber = document.getElementById('cardNo').value;
+        const cardExpiry = document.getElementById('cardExpiry').value;
+        const cardCvv = document.getElementById('cardCvv').value;
+        if (!cardNumber || !cardExpiry || !cardCvv) {
+          alert('Please fill in all Debit Card details.');
+          return;
+        }
+        paymentDetails = { method: 'Debit Card', cardNumber, cardExpiry, cardCvv };
+      }
+
+      let transactionDetails = null;
+      const checkoutResult = document.getElementById('checkoutResult');
+      const paymentStatus = document.getElementById('paymentStatus');
+      const confirmPaymentSection = document.getElementById('confirmPaymentSection');
+      const confirmPaymentBtn = document.getElementById('confirmPaymentBtn');
+      const timerElement = document.getElementById('timer');
+      const generateReceiptBtn = document.getElementById('generateReceiptBtn');
+      const receiptDetails = document.getElementById('receiptDetails');
+      const qrCodeContainer = document.getElementById('qrCodeContainer');
+      const errorMessage = document.getElementById('errorMessage');
+
+      // Reset checkout result section
+      checkoutResult.style.display = 'none';
+      paymentStatus.textContent = '';
+      paymentStatus.className = 'payment-status'; // Reset classes
+      confirmPaymentSection.style.display = 'none';
+      generateReceiptBtn.style.display = 'none';
+      receiptDetails.innerHTML = '';
+      qrCodeContainer.innerHTML = '';
+      errorMessage.textContent = '';
+
+      try {
+        // Send checkout request to the backend
+        console.log('Sending checkout request with payload:', {
+          customer_id: currentUser.email_id,
+          amount: parseFloat(cartTotal),
+          payment_method: paymentDetails.method,
+          card_no: paymentDetails.cardNumber || 'N/A',
+          bill_address: billAddress
+        });
+
+        const response = await fetch('http://localhost:5000/api/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customer_id: currentUser.email_id,
+            amount: parseFloat(cartTotal),
+            payment_method: paymentDetails.method,
+            card_no: paymentDetails.cardNumber || 'N/A',
+            bill_address: billAddress
+          })
+        });
+
+        console.log('Checkout response status:', response.status);
+        console.log('Checkout response headers:', response.headers.get('Content-Type'));
+
+        const data = await response.json();
+        console.log('Checkout response data:', data);
+
+        if (!response.ok) {
+          console.error('Response not OK. Status:', response.status, 'Data:', data);
+          throw new Error(data.message || 'Checkout failed.');
+        }
+
+        // Store transaction details for receipt generation
+        transactionDetails = data.transaction;
+        console.log('Transaction details:', transactionDetails);
+        localStorage.setItem('lastTransaction', JSON.stringify(transactionDetails));
+
+        checkoutResult.style.display = 'block';
+
+        if (paymentMethod === 'Google Pay') {
+          // Show QR code
+          qrCodeContainer.innerHTML = `
+            <h4>Scan to Pay with Google Pay</h4>
+            <img src="images/google-pay-qr-code.png" alt="Payment QR Code">
+          `;
+
+          // Show payment confirmation prompt
+          paymentStatus.textContent = 'Waiting for payment confirmation...';
+          confirmPaymentSection.style.display = 'block';
+
+          // Simulate payment verification with a 30-second timer
+          let timeLeft = 30;
+          timerElement.textContent = timeLeft;
+          let paymentConfirmed = false;
+
+          const timer = setInterval(() => {
+            timeLeft--;
+            timerElement.textContent = timeLeft;
+            if (timeLeft <= 0) {
+              clearInterval(timer);
+              if (!paymentConfirmed) {
+                paymentStatus.textContent = 'Payment Failed: Payment not completed within the time limit.';
+                paymentStatus.classList.add('failed');
+                confirmPaymentSection.style.display = 'none';
+                generateReceiptBtn.style.display = 'block';
+                transactionDetails.status = 'failed';
+                transactionDetails.failure_reason = 'Payment not completed within the time limit.';
+                localStorage.setItem('lastTransaction', JSON.stringify(transactionDetails));
+              }
+            }
+          }, 1000);
+
+          confirmPaymentBtn.addEventListener('click', () => {
+            clearInterval(timer);
+            paymentConfirmed = true;
+            paymentStatus.textContent = 'Transaction Payment Successful!';
+            paymentStatus.classList.add('success');
+            confirmPaymentSection.style.display = 'none';
+            generateReceiptBtn.style.display = 'block';
+            transactionDetails.status = 'success';
+            localStorage.setItem('lastTransaction', JSON.stringify(transactionDetails));
+            cart = [];
+            localStorage.setItem('cart', JSON.stringify(cart));
+            displayCart();
+          }, { once: true });
+        } else {
+          // For credit/debit card, assume success
+          paymentStatus.textContent = `Transaction Payment Successful! Payment via ${paymentDetails.method}.`;
+          paymentStatus.classList.add('success');
+          generateReceiptBtn.style.display = 'block';
+          transactionDetails.status = 'success';
+          localStorage.setItem('lastTransaction', JSON.stringify(transactionDetails));
+          cart = [];
+          localStorage.setItem('cart', JSON.stringify(cart));
+          displayCart();
+        }
+      } catch (err) {
+        console.error('Error during order placement:', err);
+        checkoutResult.style.display = 'block';
+        paymentStatus.textContent = `Payment Failed: ${err.message}`;
+        paymentStatus.classList.add('failed');
+        generateReceiptBtn.style.display = 'block';
+        if (transactionDetails) {
+          transactionDetails.status = 'failed';
+          transactionDetails.failure_reason = err.message;
+          localStorage.setItem('lastTransaction', JSON.stringify(transactionDetails));
+        } else {
+          errorMessage.textContent = 'Error during checkout. Please try again.';
+        }
+      }
+    }
+
+    // Generate Receipt
+    document.getElementById('generateReceiptBtn').addEventListener('click', async () => {
+      const receiptDetails = document.getElementById('receiptDetails');
+      const transactionDetails = JSON.parse(localStorage.getItem('lastTransaction'));
+
+      if (!transactionDetails) {
+        receiptDetails.innerHTML = '<p class="error-message">No transaction details available.</p>';
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:5000/api/receipt/${transactionDetails.transaction_id}`);
+        const data = await response.json();
+        if (response.ok) {
+          const receipt = data.receipt;
+          receiptDetails.innerHTML = `
+            <p>Receipt ID: ${receipt.receipt_id}</p>
+            <p>Transaction ID: ${receipt.transaction_id}</p>
+            <p>Amount: ₹${receipt.amount}</p>
+            <p>Payment Method: ${receipt.payment_method}</p>
+            <p>Status: ${receipt.status}</p>
+            ${receipt.status === 'failed' ? `<p>Failure Reason: ${receipt.failure_reason}</p>` : ''}
+            <p>Billing Address: ${receipt.bill_address}</p>
+          `;
+        } else {
+          receiptDetails.innerHTML = `<p class="error-message">Error fetching receipt: ${data.message}</p>`;
+        }
+      } catch (err) {
+        console.error('Error fetching receipt:', err);
+        receiptDetails.innerHTML = '<p class="error-message">Error fetching receipt. Please try again.</p>';
+      }
+    });
+
+    // Submit Review
+    async function submitReview(bookId) {
+      if (!currentUser) {
+        alert('Please sign in to submit a review.');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      const rating = document.getElementById(`rating-${bookId}`).value;
+      const reviewComment = document.getElementById(`comment-${bookId}`).value;
+
+      try {
+        await fetch('http://localhost:5000/api/reviews', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customer_id: currentUser.email_id,
+            book_id: bookId,
+            rating: parseInt(rating),
+            comment: reviewComment || null
+          })
+        });
+
+        // Reload books to update average rating and reviews
+        loadBooks();
+      } catch (err) {
+        console.error('Error submitting review:', err);
+        alert('Error submitting review.');
+      }
+    }
+
+    // Load Wishlist
+    async function loadWishlist() {
+      try {
+        const response = await fetch(`http://localhost:5000/api/wishlist/${currentUser.email_id}`);
+        wishlist = await response.json();
+        localStorage.setItem('wishlist', JSON.stringify(wishlist));
+        displayWishlist();
+      } catch (err) {
+        console.error('Error loading wishlist:', err);
+      }
+    }
+
+    // Add to Wishlist
+    async function addToWishlist(bookId) {
+      if (!currentUser) {
+        alert('Please sign in to add items to your wishlist.');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      try {
+        await fetch('http://localhost:5000/api/wishlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ customer_id: currentUser.email_id, book_id: bookId })
+        });
+
+        loadWishlist();
+      } catch (err) {
+        console.error('Error adding to wishlist:', err);
+        alert('Error adding to wishlist.');
+      }
+    }
+
+    // Remove from Wishlist
+    async function removeFromWishlist(bookId) {
+      try {
+        await fetch('http://localhost:5000/api/wishlist', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ customer_id: currentUser.email_id, book_id: bookId })
+        });
+
+        wishlist = wishlist.filter(item => item.book_id !== bookId);
+        localStorage.setItem('wishlist', JSON.stringify(wishlist));
+        displayWishlist();
+      } catch (err) {
+        console.error('Error removing from wishlist:', err);
+        alert('Error removing from wishlist.');
+      }
+    }
+
+    // Display Wishlist
+    function displayWishlist() {
+      const wishlistSection = document.getElementById('wishlistSection');
+      const wishlistItemsDiv = document.getElementById('wishlistItems');
+
+      if (wishlist.length === 0) {
+        wishlistSection.style.display = 'none';
+        return;
+      }
+
+      wishlistSection.style.display = 'block';
+      wishlistItemsDiv.innerHTML = '';
+
+      wishlist.forEach(item => {
+        const wishlistItem = document.createElement('div');
+        wishlistItem.className = 'wishlist-item';
+        wishlistItem.innerHTML = `
+          <img src="${item.image_url}" alt="${item.name}">
+          <span>${item.name}</span>
+          <span>₹${item.price}</span>
+          <button onclick="removeFromWishlist(${item.book_id})">Remove</button>
+        `;
+        wishlistItemsDiv.appendChild(wishlistItem);
+      });
+    }
+
+    // Logout
+    function logout() {
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('cart');
+      localStorage.removeItem('wishlist');
+      cart = [];
+      wishlist = [];
+      currentUser = null;
+      signInBtn.classList.remove('hidden');
+      signUpBtn.classList.remove('hidden');
+      logoutBtn.classList.add('hidden');
+      window.location.href = 'index.html';
+    }
+
+    // Initial Load
+    loadBooks();
+  </script>
 </body>
 </html>
+
+ 
+
