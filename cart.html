@@ -1,31 +1,346 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Your Cart | Bookshop</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cart - Aarthi's Bookshop</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #e0f7fa, #b2ebf2);
+      min-height: 100vh;
+    }
+    .navbar {
+      background-color: #4a90e2;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .navbar h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .navbar button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+    .back-btn {
+      background-color: #f5a623;
+      color: white;
+    }
+    .back-btn:hover {
+      background-color: #e69520;
+    }
+    .logout-btn {
+      background-color: #dc3545;
+      color: white;
+    }
+    .logout-btn:hover {
+      background-color: #c82333;
+    }
+    .cart-section {
+      margin: 20px;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .cart-section h2 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 15px;
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .cart-item:last-child {
+      border-bottom: none;
+    }
+    .cart-item button {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background-color 0.3s;
+    }
+    .cart-item button:hover {
+      background-color: #c82333;
+    }
+    .quantity-controls button {
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background-color 0.3s;
+    }
+    .quantity-controls button:hover {
+      background-color: #357abd;
+    }
+    .cart-total {
+      font-weight: bold;
+      font-size: 18px;
+      color: #e74c3c;
+      margin-top: 10px;
+      text-align: right;
+    }
+    .checkout-btn {
+      display: block;
+      margin: 10px 0 0 auto;
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    .checkout-btn:hover {
+      background-color: #218838;
+    }
+    .empty-cart {
+      text-align: center;
+      font-size: 18px;
+      color: #666;
+      padding: 20px;
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>🛒 Your Cart</h1>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="books.html">Books</a>
-      <a href="cart.html">Cart</a>
-      <a href="login.html">Login</a>
-    </nav>
-  </header>
+  <!-- Navigation Bar -->
+  <div class="navbar">
+    <button class="back-btn" onclick="window.location.href='index.html'">Back to Books</button>
+    <h1>Cart - Aarthi's Bookshop</h1>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
 
-  <main>
-    <div id="cart-items" class="cart-container">
-      <!-- Cart items will be shown here -->
+  <!-- Cart Section -->
+  <div id="cartSection" class="cart-section">
+    <h2>My Cart</h2>
+    <div id="cartItems"></div>
+    <div id="cartTotal" class="cart-total"></div>
+    <!-- Payment Options -->
+    <div id="paymentOptions" class="mt-4" style="display: none;">
+      <h3 class="text-lg font-semibold mb-2">Select Payment Method</h3>
+      <select id="paymentMethod" class="border p-2 rounded w-full mb-4">
+        <option value="googlepay">Google Pay</option>
+        <option value="creditcard">Credit Card</option>
+        <option value="debitcard">Debit Card</option>
+      </select>
+
+      <!-- Payment Details -->
+      <div id="googlepayDetails" class="payment-details hidden">
+        <p class="text-gray-600 mb-2">Scan the QR code to pay via Google Pay:</p>
+        <img src="path/to/your/qr-code.png" alt="Google Pay QR Code" class="w-48 h-48 mx-auto mb-2">
+        <p class="text-gray-600 text-center">Open Google Pay, scan the QR code, and complete the payment.</p>
+      </div>
+      <div id="creditcardDetails" class="payment-details hidden">
+        <label for="creditCardNumber" class="block mb-2">Card Number</label>
+        <input type="text" id="creditCardNumber" class="border p-2 rounded w-full mb-2" placeholder="1234 5678 9012 3456">
+        <label for="creditCardExpiry" class="block mb-2">Expiry Date</label>
+        <input type="text" id="creditCardExpiry" class="border p-2 rounded w-full mb-2" placeholder="MM/YY">
+        <label for="creditCardCvv" class="block mb-2">CVV</label>
+        <input type="text" id="creditCardCvv" class="border p-2 rounded w-full" placeholder="123">
+      </div>
+      <div id="debitcardDetails" class="payment-details hidden">
+        <label for="debitCardNumber" class="block mb-2">Card Number</label>
+        <input type="text" id="debitCardNumber" class="border p-2 rounded w-full mb-2" placeholder="1234 5678 9012 3456">
+        <label for="debitCardExpiry" class="block mb-2">Expiry Date</label>
+        <input type="text" id="debitCardExpiry" class="border p-2 rounded w-full mb-2" placeholder="MM/YY">
+        <label for="debitCardCvv" class="block mb-2">CVV</label>
+        <input type="text" id="debitCardCvv" class="border p-2 rounded w-full" placeholder="123">
+      </div>
     </div>
-    <button onclick="checkout()" class="btn">Checkout</button>
-  </main>
+    <button id="placeOrderBtn" class="checkout-btn" style="display: none;">Place Order</button>
+  </div>
 
-  <footer>
-    <p>&copy; 2025 Bookshop Automation</p>
-  </footer>
-  <script src="script.js"></script>
+  <script>
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+    // Redirect to login if not logged in
+    if (!currentUser) {
+      window.location.href = 'index.html';
+    }
+
+    // Display Cart
+    function displayCart() {
+      const cartItemsDiv = document.getElementById('cartItems');
+      const cartTotalDiv = document.getElementById('cartTotal');
+      const paymentOptions = document.getElementById('paymentOptions');
+      const placeOrderBtn = document.getElementById('placeOrderBtn');
+
+      if (cart.length === 0) {
+        cartItemsDiv.innerHTML = '<p class="empty-cart">Your cart is empty.</p>';
+        cartTotalDiv.textContent = '';
+        paymentOptions.style.display = 'none';
+        placeOrderBtn.style.display = 'none';
+        return;
+      }
+
+      cartItemsDiv.innerHTML = '';
+      let total = 0;
+
+      cart.forEach(item => {
+        const itemTotal = item.book.price * item.amount;
+        total += itemTotal;
+        const cartItem = document.createElement('div');
+        cartItem.className = 'cart-item';
+        cartItem.innerHTML = `
+          <span>${item.book.name}</span>
+          <div class="quantity-controls">
+            <button onclick="updateQuantity(${item.item_id}, -1)">-</button>
+            <span>${item.amount}</span>
+            <button onclick="updateQuantity(${item.item_id}, 1)">+</button>
+          </div>
+          <span>₹${itemTotal}</span>
+          <button onclick="removeFromCart(${item.item_id})">Remove</button>
+        `;
+        cartItemsDiv.appendChild(cartItem);
+      });
+
+      cartTotalDiv.textContent = `Total: ₹${total}`;
+      paymentOptions.style.display = 'block';
+      placeOrderBtn.style.display = 'block';
+    }
+
+    // Update Quantity
+    function updateQuantity(bookId, change) {
+      const cartItem = cart.find(item => item.item_id === bookId);
+      if (cartItem) {
+        cartItem.amount += change;
+        if (cartItem.amount <= 0) {
+          removeFromCart(bookId);
+          return;
+        }
+        localStorage.setItem('cart', JSON.stringify(cart));
+        displayCart();
+
+        // Update backend cart
+        fetch('http://localhost:5000/api/cart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ customer_id: currentUser.email_id, item_id: bookId, amount: cartItem.amount })
+        }).catch(err => console.error('Error updating cart:', err));
+      }
+    }
+
+    // Remove from Cart
+    function removeFromCart(bookId) {
+      cart = cart.filter(item => item.item_id !== bookId);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      displayCart();
+
+      // Remove from backend cart
+      fetch('http://localhost:5000/api/cart', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customer_id: currentUser.email_id, item_id: bookId })
+      }).catch(err => console.error('Error removing from cart:', err));
+    }
+
+    // Payment Method Selection
+    const paymentMethodSelect = document.getElementById('paymentMethod');
+    const paymentDetails = document.querySelectorAll('.payment-details');
+    paymentMethodSelect.addEventListener('change', (e) => {
+      paymentDetails.forEach(detail => detail.classList.add('hidden'));
+      const selectedMethod = e.target.value;
+      document.getElementById(`${selectedMethod}Details`).classList.remove('hidden');
+    });
+
+    // Place Order
+    document.getElementById('placeOrderBtn').addEventListener('click', async () => {
+      if (!currentUser || cart.length === 0) {
+        alert('Your cart is empty or you are not signed in.');
+        return;
+      }
+
+      const paymentMethod = paymentMethodSelect.value;
+      let paymentDetails = {};
+
+      if (paymentMethod === 'googlepay') {
+        // Simulate Google Pay payment (QR code scanning)
+        paymentDetails = { method: 'Google Pay', details: 'Payment via QR code' };
+      } else if (paymentMethod === 'creditcard') {
+        const cardNumber = document.getElementById('creditCardNumber').value;
+        const cardExpiry = document.getElementById('creditCardExpiry').value;
+        const cardCvv = document.getElementById('creditCardCvv').value;
+        if (!cardNumber || !cardExpiry || !cardCvv) {
+          alert('Please fill in all Credit Card details.');
+          return;
+        }
+        paymentDetails = { method: 'Credit Card', cardNumber, cardExpiry, cardCvv };
+      } else if (paymentMethod === 'debitcard') {
+        const cardNumber = document.getElementById('debitCardNumber').value;
+        const cardExpiry = document.getElementById('debitCardExpiry').value;
+        const cardCvv = document.getElementById('debitCardCvv').value;
+        if (!cardNumber || !cardExpiry || !cardCvv) {
+          alert('Please fill in all Debit Card details.');
+          return;
+        }
+        paymentDetails = { method: 'Debit Card', cardNumber, cardExpiry, cardCvv };
+      }
+
+      const total = cart.reduce((sum, item) => sum + item.book.price * item.amount, 0);
+
+      try {
+        const response = await fetch('http://localhost:5000/api/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customer_id: currentUser.email_id,
+            amount: total,
+            payment_method: paymentDetails.method,
+            card_no: paymentDetails.cardNumber || 'N/A',
+            bill_address: '123 Main St, City, Country'
+          })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          alert(`Order placed successfully! Payment via ${paymentDetails.method}.`);
+          cart = [];
+          localStorage.setItem('cart', JSON.stringify(cart));
+          displayCart();
+        } else {
+          alert('Order placement failed: ' + data.message);
+        }
+      } catch (err) {
+        console.error('Error during order placement:', err);
+        alert('Order placement failed.');
+      }
+    });
+
+    // Logout
+    function logout() {
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('cart');
+      cart = [];
+      window.location.href = 'index.html';
+    }
+
+    // Initial Load
+    displayCart();
+  </script>
 </body>
 </html>
+   
